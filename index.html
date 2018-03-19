@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Buscador de fotografías</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: lavender;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+        }
+        h1{
+            text-decoration: underline;
+        }
+        th{
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1 class= "text-center">Búsqueda de fotografías mediante etiquetas</h1><br> <br>
+    <div class="container">
+        <form id="formulario">
+            <div class="form-group">
+                <label for= "etiquetas"><b>Etiquetas</b></label>
+                <input type="text" class="form-control etiqueta" placeholder="Escribe las etiquetas separándolas por espacios" required>
+            </div>
+            
+            <label for="Busqueda"><b>Tipo de Búsqueda</b></label>
+            <select name="opciones" class= "tipoBusqueda">
+                <option value="todas">Todas</option>
+                <option value="algunas">Algunas</option>
+            </select><br><br>
+            <button type="submit" class="btn btn-success" id="submit" value="Buscar">BUSCAR</button>
+        </form><br><br>
+        
+        <table id="tabla" class="table table-hover"> <!-- tabla que almacenará la búsqueda-->
+            <thead>
+                <tr>
+                    <th>Título de la imagen</th>
+                    <th>Enlace</th>
+                    <th>Foto</th>
+                    <th>Fecha de publicación</th>
+                    <th>Autor</th>
+                    <th>Etiquetas</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoT">
+            </tbody>
+        </table>
+        <script>
+            $(document).ready(function(){
+                
+                $("#formulario").submit(function(event){
+                    
+                    $(".resultados").remove(); // con esta función borramos lo que hemos buscado antes
+                    var flickr = "http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
+                    var etiqueta = $(".etiqueta").val();
+                    var tipoBusqueda = $(".tipoBusqueda").val();
+                    var etiquetas = etiqueta.replace(" " ,","); // con el replace esto sustituimos los espacios por comas
+                    
+                    $.getJSON( 
+                    flickr, {
+                        tags:etiquetas,
+                        tagmode:tipoBusqueda,
+                        format:"json"
+                    },
+                    function(data) {
+                        //con esto generamos una fila para cada resultado encontrado
+                        $.each( data.items, function(i, item) {
+                            var nuevafila =$("<tr class='resultado'><td><b>"+item.title+"</b></td><td>"+item.link+
+                                "</td><td><img src='"+item.media.m+"'></td><td>"+item.published+"</td><td>"+item.author+
+                                    "</td><td>"+item.tags+"</td></tr>");
+                                    
+                                    nuevafila.appendTo("#cuerpoT");
+                                });
+                            }
+                            );
+                            return false;
+                        });
+                        
+                    });
+                </script>
+                
+            </div>    
+        </body>
+        </html>
